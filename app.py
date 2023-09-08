@@ -3,7 +3,7 @@ import streamlit as st
 from functions import load_pdf_data, load_txt_data, process_document, process_query
 
 def main():
-    st.title("Chat With Your Documents (txt and pdf)")
+    st.title("Chat With Your Documents")
 
     file = st.file_uploader("Upload a file", type=["txt", "pdf"])
 
