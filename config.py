@@ -11,6 +11,16 @@ load_dotenv()
 
 text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=300, chunk_overlap=30)
 
+"""from langchain.embeddings import HuggingFaceBgeEmbeddings
+
+model_name = "BAAI/bge-small-en"
+model_kwargs = {'device': 'cpu'}
+encode_kwargs = {'normalize_embeddings': False}
+embeddings = HuggingFaceBgeEmbeddings(
+    model_name=model_name,
+    model_kwargs=model_kwargs,
+    encode_kwargs=encode_kwargs
+)"""
 
 llm = ChatOpenAI(model_name="gpt-4", temperature=0.3, max_tokens=4095)
 embeddings = OpenAIEmbeddings()

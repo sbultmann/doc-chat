@@ -4,8 +4,10 @@ from PyPDF2 import PdfReader
 
 from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
-from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
+
+
+
 
 from config import text_splitter, embeddings, QA_CHAIN_PROMPT, llm
 
@@ -43,12 +45,8 @@ def process_document(type):
     elif type == "application/pdf":
         loader = PyPDFLoader("./docs/uploaded_file.pdf").load()
     splits = text_splitter.split_documents(loader)
-    index = Chroma.from_documents(
-        documents=splits,
-        embedding=embeddings
-        )
-    print(f'vector DB created. Count: {index._collection.count()}')
-    return index
+    
+    return splits
 
 def process_query(index):
     fetch_k=index._collection.count()
