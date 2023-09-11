@@ -13,24 +13,24 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=
 
 """from langchain.embeddings import HuggingFaceBgeEmbeddings
 
-model_name = "BAAI/bge-small-en"
+model_name = "intfloat/multilingual-e5-large"
 model_kwargs = {'device': 'cpu'}
 encode_kwargs = {'normalize_embeddings': False}
 embeddings = HuggingFaceBgeEmbeddings(
     model_name=model_name,
     model_kwargs=model_kwargs,
     encode_kwargs=encode_kwargs
-)"""
-
+)
+"""
 llm = ChatOpenAI(model_name="gpt-4", temperature=0.3, max_tokens=4095)
 embeddings = OpenAIEmbeddings()
 
 #Prompt tempalte used for query
 template = """You are a helpful writing assistent.
 Answer as extensive as possible. 
-If you don't know the answer, just say that you don't know, don't try to make up an answer. 
 Always say "thanks for asking!" at the end of the answer.
-Use the following pieces of context to answer the question at the end. 
+Use the following pieces of context to answer the question at the end.
+If you don't know the answer, just say that you don't know, don't try to make up an answer. 
 Return answer formatted as Mardown.
 Context: {context}
 Question: {question}

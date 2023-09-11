@@ -9,81 +9,88 @@ from langchain.vectorstores import Chroma
 # Missing stuff clear upload box after upload --> use st.form
 # Set collection field to newly created
 # Use open source model for embedding
+# add field to show sources
 
 def main(client):
-    options = [x.name for x in client.list_collections()]
     st.title("Chat With Your Documents")
-    st.header("Step 1: Choose or create a collection:")
-    new_collection = st.text_input("Create new collection:")
-    option = st.selectbox(
-        'Choose existing collection',
+    st.header("Step 1 (optional):")
+    st.subheader("Create a new collection")
+    with st.form('select_collection'):
+        new_collection = st.text_input("Create new collection:")
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            collection_name = "_".join(new_collection.split(" "))
+            index = Chroma(
+                    client=client,
+                    collection_name=collection_name,
+                    embedding_function=embeddings,
+                )    
+    
+    st.header("Step 2 (optional):")
+    st.subheader("Add a new document to the collection")
+    with st.form("upload_document"):
+        uploaded_files = st.file_uploader("Upload a file", type=["txt", "pdf"], accept_multiple_files=True)
+        options = [x.name for x in client.list_collections()]
+        collection_name = st.selectbox(
+        'Choose collection',
         options
         )
+        processed = st.form_submit_button("Process document")
+        if processed:
+            for file in uploaded_files:
+                if file.type == "text/plain":
+                    doc = "text"
+                    data = load_txt_data(file)
+                    splits = process_document(file.type)
+                    index = Chroma(
+                            client=client,
+                            collection_name=collection_name,
+                            embedding_function=embeddings,
+                        )
+                    index.add_documents(splits)
+                    print(f'Added {len(splits)} to vector DB. Count: {index._collection.count()}')
+
+                elif file.type == "application/pdf":
+                    doc = "text"
+                    data = load_pdf_data(file)
+                    splits = process_document(file.type)
+                    index = Chroma(
+                            client=client,
+                            collection_name=collection_name,
+                            embedding_function=embeddings,
+                        )
+                    index.add_documents(splits)
+                    print(f'Added {len(splits)} to vector DB. Count: {index._collection.count()}')
+
+
     
-
-    st.header("Step 2: Add a new document to the collection:")
-    file = st.file_uploader("Upload a file", type=["txt", "pdf"])
-
-
-    if file is not None:
-        if file.type == "text/plain":
-            doc = "text"
-            data = load_txt_data(file)
-            splits = process_document(file.type)
-            if new_collection:
-                print("new collection chosen ...")
-                index = Chroma(
-                        client=client,
-                        collection_name=new_collection,
-                        embedding_function=embeddings,
-                    )
-                index.add_documents(splits)
-            elif option:
-                print(f"old collection chosen ... NAME:{option}")
-                index = Chroma(
-                    client=client,
-                    collection_name=option,
-                    embedding_function=embeddings,
-                )
-                index.add_documents(splits)
-            print(f'Added {len(splits)} to vector DB. Count: {index._collection.count()}')
-
-        elif file.type == "application/pdf":
-            doc = "text"
-            data = load_pdf_data(file)
-            splits = process_document(file.type, index)
-            if new_collection:
-                print("new collection chosen ...")
-                index = Chroma(
-                        splits,
-                        client=client,
-                        collection_name=new_collection,
-                        embedding_function=embeddings,
-                    )
-            elif option:
-                print("old collection chosen ...")
-                index = Chroma(
-                    splits,
-                    client=client,
-                    collection_name=option,
-                    embedding_function=embeddings,
-                )
-            index.add(splits)
-            print(f'Added {len(splits)} to vector DB. Count: {index._collection.count()}')
 
         # do something with the data
 
-        st.header("Step 3: Chat with your documents:")
+    st.header("Step 3:")
+    st.subheader("Chat with your documents")
+    with st.form("question"):
+        options = [x.name for x in client.list_collections()]
+        collection_name = st.selectbox(
+        'Choose collection',
+        options
+        )
         question = st.text_input("Enter your question here:")
-        submit_button = st.button('Submit')
+        submit_button = st.form_submit_button('Submit')
 
         if submit_button:
-            if doc == "text":
+                index = Chroma(
+                        client=client,
+                        collection_name=collection_name,
+                        embedding_function=embeddings,
+                    )
                 qa_chain = process_query(index)
-                response = qa_chain({"query": question})["result"]
-
-            if response:
-                st.markdown(response)
+                response = qa_chain({"query": question})
+                st.markdown("## Response:")
+                st.markdown(response["result"])
+                st.markdown("## Sources:")
+                for source in response["source_documents"]:
+                    print(source.page_content)
 
 
 if __name__ == "__main__":
