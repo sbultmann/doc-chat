@@ -86,11 +86,11 @@ def main(client):
                     )
                 qa_chain = process_query(index)
                 response = qa_chain({"query": question})
-                st.markdown("## Response:")
+                st.subheader("Response:")
                 st.markdown(response["result"])
-                st.markdown("## Sources:")
-                for source in response["source_documents"]:
-                    print(source.page_content)
+                with st.expander("Sources:"):
+                    for source in response["source_documents"]:
+                        st.markdown('* '+source.page_content)
 
 
 if __name__ == "__main__":
