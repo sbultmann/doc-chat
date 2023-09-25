@@ -6,10 +6,18 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
 from langchain.chains import RetrievalQA
 
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import LLMChainExtractor
+from langchain.llms import OpenAI
 
+
+# Wrap our vectorstore
+#llm_compression = OpenAI(model_name="gpt-3.5-turbo-16k", temperature=0, max_tokens=11000)
 
 
 from config import text_splitter, embeddings, QA_CHAIN_PROMPT, llm
+
+compressor = LLMChainExtractor.from_llm(llm)
 
 def pdf_to_text(pdf_path):
     # Step 1: Convert PDF to images
@@ -51,8 +59,9 @@ def process_document(type):
 def process_query(index):
     fetch_k=index._collection.count()
     k = 1+int(fetch_k*0.1)
-    if k > 10:
-        k = 10
+    if k > 11:
+        k = 11
+        fetch_k = 110
     print(f'vector DB loaded. fetch_k: {fetch_k}, k: {k}')
     qa_chain = RetrievalQA.from_chain_type(
             llm,
@@ -61,3 +70,17 @@ def process_query(index):
             chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
         )
     return qa_chain
+
+def process_query2(index):
+    compression_retriever = ContextualCompressionRetriever(
+        base_compressor=compressor,
+        base_retriever=index.as_retriever(search_kwargs={'k': 20})
+    )
+    qa_chain = RetrievalQA.from_chain_type(
+            llm,
+            retriever=compression_retriever,
+            return_source_documents=True,
+            chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
+        )
+    return qa_chain
+

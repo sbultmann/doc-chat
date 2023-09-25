@@ -1,6 +1,6 @@
 import streamlit as st
 
-from functions import load_pdf_data, load_txt_data, process_document, process_query
+from functions import load_pdf_data, load_txt_data, process_document, process_query, process_query2
 from config import embeddings
 
 import chromadb
@@ -84,7 +84,7 @@ def main(client):
                         collection_name=collection_name,
                         embedding_function=embeddings,
                     )
-                qa_chain = process_query(index)
+                qa_chain = process_query2(index)
                 response = qa_chain({"query": question})
                 st.subheader("Response:")
                 st.markdown(response["result"])
