@@ -47,7 +47,6 @@ multidict==6.0.4
 mypy-extensions==1.0.0
 numexpr==2.8.5
 numpy==1.25.2
-onnxruntime
 openai==0.28.0
 overrides==7.4.0
 packaging==23.1
