@@ -22,7 +22,7 @@ embeddings = HuggingFaceBgeEmbeddings(
     encode_kwargs=encode_kwargs
 )
 """
-llm = ChatOpenAI(model_name="gpt-4-turbo", temperature=0.3, max_tokens=11000)
+llm = ChatOpenAI(model_name="gpt-4-turbo", temperature=0.3, max_tokens=4096)
 embeddings = OpenAIEmbeddings()
 
 #Prompt tempalte used for query
