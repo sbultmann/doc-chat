@@ -29,7 +29,8 @@ embeddings = OpenAIEmbeddings()
 template = """You are a helpful writing assistent.
 Answer as extensive as possible. 
 Use the following pieces of context to answer the question at the end.
-If you don't know the answer, just say that you don't know, don't try to make up an answer. 
+Base your answer exclusively on these pieces of context.
+If you don't know the answer based on the pieces of context, just say that you don't know, don't try to make up an answer. 
 Return answer formatted as Mardown.
 Context: {context}
 Question: {question}

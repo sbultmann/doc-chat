@@ -41,7 +41,7 @@ def main(client):
                 if file.type == "text/plain":
                     doc = "text"
                     data = load_txt_data(file)
-                    splits = process_document(file.type)
+                    splits = process_document(file.type, file)
                     index = Chroma(
                             client=client,
                             collection_name=collection_name,
@@ -53,7 +53,7 @@ def main(client):
                 elif file.type == "application/pdf":
                     doc = "text"
                     data = load_pdf_data(file)
-                    splits = process_document(file.type)
+                    splits = process_document(file.type, file)
                     index = Chroma(
                             client=client,
                             collection_name=collection_name,
@@ -90,7 +90,7 @@ def main(client):
                 st.markdown(response["result"])
                 with st.expander("Sources:"):
                     for source in response["source_documents"]:
-                        st.markdown('* '+source.page_content)
+                        st.markdown('* '+str(source.metadata)+"\n"+source.page_content)
 
 
 if __name__ == "__main__":

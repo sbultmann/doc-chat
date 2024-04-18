@@ -33,12 +33,12 @@ def pdf_to_text(pdf_path):
             f.write(text + '\n')  # Write the text to the file and add a newline for each page
 
 def load_txt_data(uploaded_file):
-    with open('./docs/uploaded_file.txt', 'w') as f:
+    with open(f'./docs/{uploaded_file.name}.txt', 'w') as f:
         f.write(uploaded_file.getvalue().decode())
     return 0
 
 def load_pdf_data(uploaded_file):
-    with open('./docs/uploaded_file.pdf', 'wb') as f:
+    with open(f'./docs/{uploaded_file.name}.pdf', 'wb') as f:
         f.write(uploaded_file.getbuffer())
     """pdf = PdfReader('./docs/uploaded_file.pdf')
     text = ""
@@ -47,11 +47,11 @@ def load_pdf_data(uploaded_file):
     pdf_to_text('./docs/uploaded_file.pdf')"""
     return 0
 
-def process_document(type):
+def process_document(type, uploaded_file):
     if type == "text/plain":
-        loader = TextLoader('./docs/uploaded_file.txt').load()
+        loader = TextLoader(f'./docs/{uploaded_file.name}.txt').load()
     elif type == "application/pdf":
-        loader = PyPDFLoader("./docs/uploaded_file.pdf").load()
+        loader = PyPDFLoader(f"./docs/{uploaded_file.name}.pdf").load()
     splits = text_splitter.split_documents(loader)
     
     return splits
